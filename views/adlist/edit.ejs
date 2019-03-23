@@ -1,0 +1,543 @@
+<a href="../adlist">
+	<i class="fa fa-arrow-left" aria-hidden="true"></i>
+	<%= __('adlist') %>
+</a>
+
+<div style="margin-top:8px">
+	<label>Image ADs:</label>
+</div>
+<div class="form-group col-md-12" style="border:1px solid rgb(207, 212, 217);">
+	<div class="form-row col-md-12">
+		<div class="form-group col-md-7">
+			<div style="margin-top:8px">
+				<label>Selected Image ADs:</label>
+			</div>
+			<div class="form-group col-md-12" style="border: 1px solid rgb(207, 212, 217);">
+				<div class="form-row col-md-12" style="height:480px;overflow:scroll;">
+					<div class="input-group imagelist" id="imagelist">
+					</div>
+				</div>
+				<div class="form-row col-md-12" style="margin-top:18px">
+					<div class="form-group col-md-6">
+						<input type="text" class="form-control f-control" name="imagelabel" id="imagelabel" placeholder="<%= __('Please enter a unique label') %>">
+					</div>
+					<div class="form-group col-md-6">
+						<input type="file" class="custom-file-input" name="imageFile" id="imageFile" >
+						<label class="custom-file-label cf-label" for="imageFile" style="margin-top: -21px">
+							<%= __('image') %>
+						</label>
+					</div>
+				</div>	
+			</div>
+		</div>
+		<div class="form-group col-md-5">
+				<div style="margin-top:8px">
+					<label>Image ADs Library:</label>
+				</div>
+				<div class="form-group col-md-12" style="border: 1px solid rgb(207, 212, 217);background-color:rgb(236, 236, 236)">
+					<div class="form-row col-md-12" style="height:480px; overflow:scroll;">
+						<div class="input-group imagelist" id="imagelistlibrary">
+						</div>
+					</div>
+					<div class="form-row col-md-12" style="margin-top:18px">
+						<div class="form-group col-md-12">
+							<input type="text" class="form-control f-control" id="searchImageADs" placeholder="Search from AD Library">
+						</div>
+					</div>
+				</div>
+		</div>
+	</div>
+</div>
+
+<div style="margin-top:8px">
+	<label>Video ADs:</label>
+</div>
+<div class="form-group col-md-12" style="border:1px solid rgb(207, 212, 217);">
+	<div class="form-row col-md-12">
+		<div class="form-group col-md-7">
+			<div style="margin-top:8px">
+				<label>Selected Video ADs:</label>
+			</div>
+			<div class="form-group col-md-12" style="border: 1px solid rgb(207, 212, 217);">
+				<div class="form-row col-md-12" style="height:530px;overflow:scroll;">
+					<div class="input-group videolist" id="videolist">
+					</div>
+				</div>
+				<div class="form-row col-md-12" style="margin-top:18px">
+					<div class="form-group col-md-6">
+						<input type="text" class="form-control f-control" name="videolabel" id="videolabel" placeholder="<%= __('Please enter a unique label') %>">
+					</div>
+					<div class="form-group col-md-6">
+						<input type="file" class="custom-file-input" name="videoFile" id="videoFile">
+						<label class="custom-file-label cf-label" for="videoFile" style="margin-top: -21px">
+							<%= __('15s or 30s video') %>
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group col-md-5">
+				<div style="margin-top:8px">
+					<label>Video ADs Library:</label>
+				</div>
+				<div class="form-group col-md-12" style="border: 1px solid rgb(207, 212, 217);background-color:rgb(236, 236, 236)">
+					<div class="form-row col-md-12" style="height:530px; overflow:scroll;">
+						<div class="input-group videolist" id="videolistlibrary">
+						</div>
+					</div>
+					<div class="form-row col-md-12" style="margin-top:18px">
+						<div class="form-group col-md-12">
+							<input type="text" class="form-control f-control" id="searchVideoADs" placeholder="Search from AD Library">
+						</div>
+					</div>
+				</div>
+		</div>
+	</div>
+</div>
+
+<form id="form-editAdlist" method="post" action="../api/adlist/edit">
+	<div class="form-row">
+		<div class="form-group col-md-6" style="display:none;">
+			<label for="id">
+				<%= __('id') %>
+			</label>
+			<input type="text" class="form-control" id="id" placeholder="<%= __('id') %>" name="id">
+		</div>
+	</div>
+
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label for="name">
+				<%= __('adlist.name') %>
+			</label>
+			<input type="text" class="form-control" id="name" placeholder="<%= __('adlist.name') %>" name="name">
+		</div>
+	</div>
+
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label for="layout">
+				<%= __('layout') %>
+			</label>
+			<select class="custom-select form-control" id="layout" name="layout">
+				<option value="0">Full screen images</option>
+				<option value="1">Split screen images and video</option>
+				<option value="2">Full screen images and video</option>
+			</select>
+		</div>
+		<div class="form-group col-md-6">
+			<label for="slideInterval">
+				<%= __('slideInterval') %>
+			</label>
+			<input type="number" class="form-control" min="5" max="120" step="1" id="slideInterval" placeholder="<%= __('slideInterval') %>"
+			 name="slideInterval">
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="description">
+			<%= __('description') %>
+		</label>
+		<textarea class="form-control" id="description" rows="3" name="description"></textarea>
+	</div>
+
+	<a href="../adlist" class="btn btn-secondary">
+		<%= __('cancel') %>
+	</a>
+	<button type="submit" class="btn btn-primary">
+		<%= __('submit') %>
+	</button>
+</form>
+
+<script>
+	var selectedADsData;
+	var searchedADsData;
+	$(function () {
+		$("#form-editAdlist").validate({
+			rules: {
+				name: { required: true, minlength: 2 },
+				description: { rangelength: [0, 200] },
+			},
+			messages: {
+				name: { required: "<%= __('name.require') %>", minlength: "<%= __('name.minlength') %>" },
+				description: { rangelength: "<%= __('description.rangelength') %>" },
+			},
+			submitHandler: function (form) {
+				$.formSubmit(form, "../adlist");
+			}
+		});
+
+		$('#imageFile').change(function () {
+			var TYPES = ['jpg', 'jpeg', 'png'];
+			var MAX_SIZE = 15 * 1024 * 1024;//15 M
+
+			var $this = $(this);
+			var file = $this[0].files[0];
+			var ext = file.name.substring(file.name.lastIndexOf(".") + 1).toLowerCase();
+			var size = file.size;
+
+			console.log($('.image').length);
+
+			if ($('.image').length > 30) {
+				alert('Image count should less than 30');
+				$('#imageFile').val("");
+				return;
+			}
+			if (size > MAX_SIZE) {
+				alert('Image size should less than 15M');
+				$('#imageFile').val("");
+				return;
+			}
+			if (!TYPES.includes(ext)) {
+				alert('Image type should be jpg, jpeg, png');
+				$('#imageFile').val("");
+				return;
+			}
+			
+			var id = $('#id').val();
+			var label = $('#imagelabel').val().replace(/^\s+|\s+$/g,"");
+
+			if (label.length == 0) {
+				alert('Please enter a label for this AD');
+				$('#imageFile').val("");
+				return;
+			}
+
+			var formData = new FormData();
+			
+			//check if the label is existed
+			$.get(`../api/ad/image/find/${label}`, function (item){
+				if(item.items.length > 0){
+					alert("The AD label is duplicated, please use a unique one.");
+					$('#imageFile').val("");
+				}
+				else{		
+					formData.append("image", $this[0].files[0]);
+					formData.append("adlist_id", id);
+					formData.append("label", label);
+					$.FileUpload({
+						formData: formData,
+						url: '../api/ad/image'
+					})
+				}
+			});
+		})
+
+		$('#videoFile').change(function () {
+			var TYPES = ['mp4'];
+			var MAX_SIZE = 50 * 1024 * 1024;//50 M
+
+			var $this = $(this);
+			var file = $this[0].files[0];
+			var ext = file.name.substring(file.name.lastIndexOf(".") + 1).toLowerCase();
+			var size = file.size;
+
+			if ($('.video').length > 30) {
+				alert('Video should less than 30');
+				$('#videoFile').val("");
+				return;
+			}
+			if (size > MAX_SIZE) {
+				alert('Video size should less than 50M');
+				$('#videoFile').val("");
+				return;
+			}
+			if (!TYPES.includes(ext)) {
+				alert('Video type should be mp4');
+				$('#videoFile').val("");
+				return;
+			}
+			
+			var id = $('#id').val();
+			var label = $('#videolabel').val().replace(/^\s+|\s+$/g,"");;
+
+			if (label.length == 0) {
+				alert('Please enter a label for this AD');
+				$('#videoFile').val("");
+				return;
+			}
+
+			var formData = new FormData();
+			//check if the label is existed
+			$.get(`../api/ad/video/find/${label}`, function (item){
+				if(item.items.length > 0){
+					alert("The AD label is duplicated, please use a unique one.");
+					$('#videoFile').val("");
+				}
+				else{
+					formData.append("video", $this[0].files[0]);
+					formData.append("adlist_id", id);
+					formData.append("label", label);
+					$.FileUpload({
+						formData: formData,
+						url: '../api/ad/video',
+					})
+				}
+			});
+		})
+
+		$('body').on('click', '.addFile', function () {
+			if (!confirm("Sure add the AD?")) {
+				return;
+			}
+			var adlist_id = $('#id').val();
+			var ad_id = $(this).val();
+			var addata = { "id":ad_id};
+			var adarray = new Array(addata);
+			var postdata = {"ads":adarray};
+			adarray
+			$.ajax({
+				type: 'post',
+				url: `../api/adlist/${adlist_id}/ads/`,
+				data:postdata,
+				timeout: 30000,
+				success: function (data) {
+					toastr.success("Success");
+					setTimeout(() => {
+						window.location.reload()
+					}, 800);
+				},
+				error: function (err) {
+					alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+				}
+			});
+		});
+
+		$('body').on('click', '.removeFile', function () {
+			if (!confirm("Sure remove file？")) {
+				return;
+			}
+			var adlist_id = $('#id').val();
+			var ad_id = $(this).val();
+			$.ajax({
+				type: 'delete',
+				url: `../api/adlist/${adlist_id}/ads/${ad_id}`,
+				timeout: 30000,
+				success: function (data) {
+					toastr.success("Success");
+					setTimeout(() => {
+						window.location.reload()
+					}, 800);
+				},
+				error: function (err) {
+					alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+				}
+			});
+		});
+
+		$('#searchImageADs').keyup(function () {
+			$.throttle(doSearchImageADs);
+		});
+		
+		function doSearchImageADs() {
+			var key = $('#searchImageADs').val();
+			if ($('#searchImageADs').val() == ""){
+				fetchImageADsFromLibrary();
+			}
+			else{
+				fetchImageADsFromLibrary(key);
+			}
+		}	
+
+		$('#searchVideoADs').keyup(function () {
+			$.throttle(doSearchVideoADs);
+		});
+		
+		function doSearchVideoADs() {
+			var key = $('#searchVideoADs').val();
+			if ($('#searchVideoADs').val() == ""){
+				fetchVideoADsFromLibrary();
+			}
+			else{
+				fetchVideoADsFromLibrary(key);
+			}
+		}	
+
+		function fetchImageADsFromLibrary(searchkey){
+			$.get(`../api/ad/image/${searchkey}`, function (item) {
+				var imagelist = '';
+				searchedADsData = item.items;
+				var isExisted;
+				if (item.items) {
+					for (ad of item.items) {
+						isExisted = false;
+						for(selectedad of selectedADsData){
+							if(selectedad.id == ad.id){
+								isExisted = true;
+								break;
+							}
+						}
+
+						if (ad.media_type === 'image') {
+							if(isExisted){
+								imagelist += `
+								<div class= "form-group" style="padding:10px">								
+									<div>
+										<div class= "form-row">
+											<img class="image" src="${ad.path}" style="margin:5px" width="60px" height="60" onerror="javascript:this.src=''" />
+										<div>
+										<button  class="btn btn-light btn-sm">
+											<i class="fa fa-check-circle" style="color: #007bff" aria-hidden="true"></i>
+										</button>
+									</div>
+									</div class= "form-group">
+										<div class="form-row">
+											<label style="width:80px;font-size:12px">${ad.label}</label>
+										</div>
+									</div>
+								</div>
+							`;
+							}
+							else{
+								imagelist += `
+								<div class= "form-group" style="padding:10px;">								
+								<div>
+									<div class= "form-row">
+									<img class="image" src="${ad.path}" style="margin:5px" width="60px" height="60" onerror="javascript:this.src=''" />
+									<div>
+									<button id="addFile" class="btn btn-light btn-sm addFile" value="${ad.id}">
+										<i class="fa fa-plus-square" aria-hidden="true"></i>
+									</button>
+								</div>
+								</div class= "form-group">
+									<div class="form-row">
+										<label style="width:80px;font-size:12px">${ad.label}</label>
+									</div>
+								</div>
+								</div>
+							`;
+							}
+						}
+					}
+				}
+				$('#imagelistlibrary').html(imagelist);
+			})
+		}
+
+		function fetchVideoADsFromLibrary(searchkey){
+			$.get(`../api/ad/video/${searchkey}`, function (item) {
+				var videosFromLibrary = '';
+				searchedADsData = item.items;
+				var isExisted;
+				if (item.items) {
+					for (ad of item.items) {
+						isExisted = false;
+						for(selectedad of selectedADsData){
+							if(selectedad.id == ad.id){
+								isExisted = true;
+								break;
+							}
+						}
+
+						if (ad.media_type === 'video') {
+							if(isExisted){
+								videosFromLibrary += `
+								<div class= "form-group" style="padding:10px">								
+									<div>
+										<div class= "form-row">
+											<video class="video" src="${ad.path}" style="margin:10px" width="100" height="75" controls="controls" />
+										<div>
+										<button  class="btn btn-light btn-sm">
+											<i class="fa fa-check-circle" style="color: #007bff" aria-hidden="true"></i>
+										</button>
+									</div>
+									</div class= "form-group">
+										<div class="form-row">
+											<label style="width:140px;font-size:12px">${ad.label}</label>
+										</div>
+									</div>
+								</div>
+							`;
+							}
+							else{
+								videosFromLibrary += `
+								<div class= "form-group" style="padding:10px;">								
+								<div>
+									<div class= "form-row">
+										<video class="video" src="${ad.path}" style="margin:10px" width="100" height="75" controls="controls" />
+									<div>
+									<button id="addFile" class="btn btn-light btn-sm addFile" value="${ad.id}">
+										<i class="fa fa-plus-square" aria-hidden="true"></i>
+									</button>
+								</div>
+								</div class= "form-group">
+									<div class="form-row">
+										<label style="width:140px;font-size:12px">${ad.label}</label>
+									</div>
+								</div>
+								</div>
+							`;
+							}
+						}
+					}
+				}
+				$('#videolistlibrary').html(videosFromLibrary);
+			})
+		}
+
+		function formInitail() {
+			var id = $.getURL('id');
+			$.get(`../api/adlist/${id}`, function (item) {
+				var imagelist = '';
+				var videolist = '';
+				selectedADsData = item.ads;
+				if (item.ads) {
+					for (ad of item.ads) {
+						if (ad.media_type === 'image') {
+							imagelist += `
+								<div class= "form-group" style="padding:10px;">								
+								<div>
+									<div class= "form-row">
+									<img class="image" src="${ad.path}" style="margin:5px" width="80px" height="80" onerror="javascript:this.src=''" />
+									<div>
+									<button id="removeFile" class="btn btn-light btn-sm removeFile" value="${ad.id}">
+										<i class="fa fa-remove" aria-hidden="true"></i>
+									</button>
+								</div>
+								</div class= "form-group">
+									<div class="form-row">
+										<label style="width:100px;font-size:14px">${ad.label}</label>
+									</div>
+								</div>
+								</div>
+							`;
+						}
+						if (ad.media_type === 'video') {
+							videolist += `
+								<div class= "form-group" style="padding:15px; margin:5px;">								
+								<div>
+									<div class= "form-row">
+										<video class="video" src="${ad.path}" style="margin:10px" width="180" height="135" controls="controls" />
+									<div>
+									<button id="removeFile" class="btn btn-light btn-sm removeFile" value="${ad.id}">
+										<i class="fa fa-remove" aria-hidden="true"></i>
+									</button>
+								</div>
+								</div class= "form-group">
+									<div class="form-row">
+										<label style="width:200px">${ad.label}</label>
+									</div>
+								</div>
+								</div>
+							`;
+						}
+					}
+				}
+
+				$('#imagelist').html(imagelist);
+				$('#videolist').html(videolist);
+				$('#id').val(item.id);
+				$('#name').val(item.name);
+				$('#layout').val(item.layout);
+				$('#description').val(item.description);
+				$('#slideInterval').val(item.slide_interval);
+				// $('#imagelabel').val(item.name + " - Image AD");
+				// $('#videolabel').val(item.name + " - Video AD");
+
+				fetchImageADsFromLibrary();
+				fetchVideoADsFromLibrary();
+			})
+		}
+		formInitail();
+	})
+</script>

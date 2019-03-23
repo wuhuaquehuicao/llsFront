@@ -1,0 +1,75 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+<script src="/javascript/bootstrap-table.js"></script>
+<script>
+  (function ($) {
+    'use strict';
+
+    var sprintf = function (str) {
+      var args = arguments,
+        flag = true,
+        i = 1;
+
+      str = str.replace(/%s/g, function () {
+        var arg = args[i++];
+
+        if (typeof arg === 'undefined') {
+          flag = false;
+          return '';
+        }
+        return arg;
+      });
+      return flag ? str : '';
+    };
+
+    $.fn.bootstrapTable.locales = {
+      formatLoadingMessage: function () {
+        return '<%= __('loadingMessage') %>';
+      },
+      formatRecordsPerPage: function (pageNumber) {
+        return sprintf('<%= __('recordsPerPage') %>', pageNumber);
+      },
+      formatShowingRows: function (pageFrom, pageTo, totalRows) {
+        return sprintf('<%= __('showingRows') %>', pageFrom, pageTo, totalRows);
+      },
+      formatSearch: function () {
+        return '<%= __('search') %>';
+      },
+      formatNoMatches: function () {
+        return '<%= __('noMatches') %>';
+      },
+      formatPaginationSwitch: function () {
+        return '<%= __('paginationSwitch') %>';
+      },
+      formatRefresh: function () {
+        return '<%= __('refresh') %>';
+      },
+      formatToggle: function () {
+        return '<%= __('toggle') %>';
+      },
+      formatColumns: function () {
+        return '<%= __('columns') %>';
+      },
+    };
+
+    $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales);
+  })(jQuery);
+</script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/extensions/resizable/bootstrap-table-resizable.min.js"></script>
+  <script src="/javascript/colResizable-1.5.source.js"></script> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.3/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.3/daterangepicker.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+<script src="/javascript/base-toastr.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="/javascript/tableExport.js"></script> -->
+
+<script src="/javascript/utils.js"></script>

@@ -1,0 +1,203 @@
+<link rel="stylesheet" href="http://apps.bdimg.com/libs/jqueryui/1.10.4/css/jquery-ui.min.css">
+<script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="http://jqueryui/style.css">
+
+<div id="toolbar" class="form-row align-items-center">
+	<div class="col-auto my-1">
+		<label><%= __('From:') %> &nbsp;</label><input type="text" id="datepickerfrom" class='col-sm-3'>
+		<label>&nbsp;&nbsp;&nbsp;&nbsp;</label>
+		<label><%= __('To:') %> &nbsp;</label><input type="text" id="datepickerto"  class='col-sm-3'>	
+	</div>	
+</div>
+
+<table id="adstatistics-table">
+</table>
+
+<script>
+	var lastFromDate;
+	var lastToDate;
+
+	$(function () {
+		initDate();
+		initDevicesTable();
+
+		$( "#datepickerfrom" ).datepicker(
+			{
+      			changeMonth: true,
+				changeYear: true,
+			    maxDate:+0,
+    		}
+		);
+
+		$( "#datepickerto" ).datepicker(
+			{
+      			changeMonth: true,
+				changeYear: true,
+				maxDate:+0,
+    		}
+		);
+	});
+
+	initDevicesTable = function () {
+		var $table = $("#adstatistics-table");
+		var url = "./api/adstatistics/page";
+		var uniqueId = 'id'
+		var columns = [
+			{ field: "label", title: '<%= __('AD label') %>', align: 'center' },			
+			{
+				field: "path",
+				title:'<%= __('Detail') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function(value, row, index){
+					if(value){
+						if (row.media_type == "video"){
+							return '<video src="'+ value +'" type="video/mp4" width="100" height = "100" controls pause loop></video>'
+						}
+						return '<img src="'+ value +'" width="100" height = "100">'
+					}
+					return ""
+				}
+			},
+			{ 
+				field: "running_time", 
+				title: '<%= __('Running Time') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function(value, row, index){
+					return formatterSeconds(value);
+				} 
+			},
+			{ field: "total_times", title: '<%= __('Number of Times') %>', align: 'center', sortable: 'true' },
+			{ field: "total_pauses", title: '<%= __('Number of Pause') %>', align: 'center', sortable: 'true' },
+			{ field: "total_devices", title: '<%= __('Total Devices') %>', align: 'center', sortable: 'true' },
+			{ field: "total_locations", title: '<%= __('Total Locations') %>', align: 'center', sortable: 'true' }
+
+			/*{
+				field: "adlist_name",
+				title: '<%= __('adlist.name') %>'
+			}*/
+			
+		];
+
+		$table.initBsTable({
+			url: url,
+			columns: columns,
+			uniqueId: uniqueId,
+			sortOrder: "desc",
+			queryParams: function(params){
+				return {
+					offset: params.offset,
+					limit: params.limit,
+					order: params.order,
+					sort: params.sort || "id",
+					fromdate: $('#datepickerfrom').val(),
+					todate: $('#datepickerto').val()
+				}
+			},
+			sidePagination: "server"
+		});
+	}
+
+	formatterSeconds = function(s) {
+        var t;
+        if(s >= 0){
+			var hour = Math.floor(s/3600);
+            var min = Math.floor(s/60) % 60;
+			var sec = s % 60;
+            if(hour < 10) {
+                t = '0'+ hour + ":";
+			} 
+			else {
+                t = hour + ":";
+			}
+
+            if(min < 10){
+				t += "0";
+			}
+
+			t += min + ":";
+			
+            if(sec < 10){
+				t += "0";
+			}
+			
+            t += sec;
+		}
+        return t;
+	}
+
+	$('#datepickerfrom').change(function(){
+		var fromdate= new Date($("#datepickerfrom").val());
+		var toDate = new Date($("#datepickerto").val());
+		if (fromdate > toDate){
+			//$('#datepickerfrom').attr("value",stringFormatterFromDate(lastFromDate));
+			alert("End date must be larger than start date");
+			return;
+		}
+	
+		refreshTable();
+	})
+
+	$('#datepickerto').change(function(){
+		var fromdate= new Date($("#datepickerfrom").val());
+		var toDate = new Date($("#datepickerto").val());
+		if (toDate < fromdate){
+			//$('#datepickerfrom').attr("value",stringFormatterFromDate(lastToDates));
+			alert("End date must be larger than start date");
+			return;
+		}
+	
+		refreshTable();
+	})
+
+	initDate = function(){
+	
+		var toDate = new Date();
+		var fromDate = new Date();
+		var fromTime = fromDate.setDate(fromDate.getDate()-7);
+		var fromDate = new Date(fromTime);
+
+		//set default date
+		$('#datepickerto').attr("value", stringFormatterFromDate(toDate));
+		$('#datepickerfrom').attr("value",stringFormatterFromDate(fromDate));
+		
+		// lastFromDate = fromDate;
+		// lastToDate = toDate;
+
+		//set max select day
+		setMaxSelectDate();
+	}
+
+	refreshTable = function(){
+		var $table = $("#adstatistics-table");
+		$table.bootstrapTable('refresh', { silent: false, url: './api/adstatistics/page'});
+	}
+
+	stringFormatterFromDate = function(date){
+		var year = date.getFullYear();
+		var month = date.getMonth()+1 < 10 ? "0"+(date.getMonth()+1) : (date.getMonth()+1);
+		var date = date.getDate() < 10 ? "0"+date.getDate() : date.getDate();
+
+		var stringFormatter = month+"/"+date+"/"+year;
+		console.log(stringFormatter);
+		return stringFormatter;
+	}
+
+	dateFromStringFormatter = function(stringFormatter){
+		var newString = stringFormatter.replace("-", "/");
+		var date = new Date(newString);
+		return date;
+	}
+
+	setMaxSelectDate = function(){
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth()+1 < 10 ? "0"+(date.getMonth()+1) : (date.getMonth()+1);
+		var date = date.getDate() < 10 ? "0"+date.getDate() : date.getDate();
+
+		$('#datepickerfrom').attr("maxDate",month+"/"+date+"/"+year);
+		$('#datepickerto').attr("maxDate",month+"/"+date+"/"+year);
+	}
+</script>

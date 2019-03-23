@@ -1,0 +1,35 @@
+{
+  "name": "lss",
+  "version": "2.2.0",
+  "description": "Power by Justek",
+  "main": "index.js",
+  "scripts": {
+    "test": "cross-env NODE_ENV=test NODE_TLS_REJECT_UNAUTHORIZED=0 nodemon app",
+    "start": "node app"
+  },
+  "engines": {
+    "node": ">=v8.11.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.279.1",
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "cross-env": "^5.1.6",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "helmet": "^3.12.1",
+    "i18n": "^0.8.3",
+    "log4js": "^2.9.0",
+    "md5": "^2.2.1",
+    "multer": "^1.3.0",
+    "nodemon": "^1.17.4",
+    "request": "^2.86.0",
+    "uuid": "^3.2.1",
+    "validator": "^10.2.0"
+  }
+}

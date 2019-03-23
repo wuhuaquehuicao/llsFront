@@ -1,0 +1,97 @@
+<a href="admin/add" class="btn btn-light">
+	<i class="fa fa-plus" aria-hidden="true"></i>
+	<%= __('add') %>
+</a>
+
+<div id="toolbar" class="form-row align-items-center">
+	<div class="col-auto my-1">
+		<input type="text" class="form-control" id="key" placeholder="Search user name">
+	</div>
+</div>
+
+<table id="users-table"></table>
+
+<script>
+	$(function () {
+		var $table = $("#users-table");
+		var url = "./api/admin/findUsersByPage";
+		var uniqueId = 'id'
+		var columns = [
+			{
+				field: "Options",
+				title: '<%= __('operations') %>',
+				align: 'center',
+				formatter: function (value, row, index) {
+					return `
+						<a class="text-secondary" href="admin/toedit?name=${row.name}&id=${row.id}" title="<%= __('operations') %>">
+							<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+						</a>
+						`;
+				},
+			},
+			{ field: "name", title: '<%= __('User Name') %>', align: 'center', sortable: 'true', /*, filterControl: "input" */ },
+			{
+				field: "role",
+				title: '<%= __('Role') %>',
+				align: 'center',
+				sortable: 'true',	
+			},
+			{
+				field: "created_at",
+				title: '<%= __('created_at') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return new Date(value).toLocaleString();
+					}
+					return ""
+				}
+			},
+			{
+				field: "updated_at",
+				title: '<%= __('updated_at') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return new Date(value).toLocaleString();
+					}
+					return ""
+				}
+			},
+		];
+		$table.initBsTable({
+			url: url,
+			columns: columns,
+			uniqueId: uniqueId,
+			sortOrder: "desc",
+			queryParams: function (params) {
+				var tmp = {
+					limit: params.limit,
+					offset: params.offset,
+					sort: params.sort || "created_at",
+					order: params.order,
+					key: $('#key').val()
+				};
+				return tmp;
+			},
+			sidePagination: "server",
+		});
+
+		$('#key').keyup(function () {
+			$.throttle(doSearch);
+		})
+
+		function doSearch() {
+			if($('#key').val() == ""){
+				$table.bootstrapTable('refresh', { silent: true, url: './api/admin/findUsersByPage', });
+			}
+			else{
+				$table.bootstrapTable('refresh', { silent: true, url: './api/admin/findUsersByKey', });
+			}
+		}	
+	});
+
+
+</script>

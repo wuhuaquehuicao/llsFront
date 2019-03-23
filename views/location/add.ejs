@@ -1,0 +1,126 @@
+<a href="../location">
+	<i class="fa fa-arrow-left" aria-hidden="true"></i>
+	<%= __('locations') %>
+</a>
+
+<form id="form-addLocationlist" method="post" action="../api/location/add">
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label for="name">
+				<%= __('location.name') %>
+			</label>
+			<input type="text" class="form-control" id="name" placeholder="<%= __('location.name') %>" name="name">
+		</div>
+		<div class="form-group col-md-6">
+			<label for="contact">
+				<%= __('contact') %>
+			</label>
+			<input type="text" class="form-control" id="contact" placeholder="<%= __('contact') %>" name="contact">
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label for="phone">
+				<%= __('phone') %>
+			</label>
+			<input type="text" class="form-control" id="phone" placeholder="<%= __('phone') %>" name="phone">
+		</div>
+		<div class="form-group col-md-6">
+			<label for="email">
+				<%= __('email') %>
+			</label>
+			<input type="text" class="form-control" id="email" placeholder="<%= __('email') %>" name="email">
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-12">
+			<label for="address">
+				<%= __('location.address') %>
+			</label>
+			<input type="text" class="form-control" id="address" placeholder="<%= __('location.address') %>" name="address">
+		</div>
+	</div>
+
+	<div class="form-row" style="display:none;">
+		<div class="form-group col-md-6">
+			<label for="adlist">
+				<%= __('active_adlist_id') %>:
+			</label>
+			<select type="text" id="active_adlist_id"  placeholder="<%= __('active_adlist_id') %>" name="active_adlist_id"></select>
+		</div>
+	</div>
+
+	<a href="../location" class="btn btn-secondary">
+		<%= __('cancel') %>
+	</a>
+	<button type="submit" class="btn btn-primary">
+		<%= __('submit') %>
+	</button>
+</form>
+
+<script>
+		var adlistData;
+		var defaultNotSelectListData= {
+			"id": "ad_notSelectedDefined",
+			"name": "<%= __('Please Select') %>"
+		};
+	
+		var objectArraySort = function (keyName) {
+			return function (objectN, objectM) {
+				var valueN = objectN[keyName]
+				var valueM = objectM[keyName]
+				if (valueN < valueM) return -1
+				else if (valueN > valueM) return 1
+				else return 0
+			}
+		}
+	
+		$(function () {
+			var url = "./../api/adlist";
+			var uniqueId = 'id'
+			var $form = $(this)
+			$.ajax({
+				type: "Get",
+				url: url,
+				data: $form.serialize(),
+				timeout: 30000,
+				success: function (data) {
+					adlistData = data.concat();
+					adlistData.sort(objectArraySort('name'))
+					adlistData.unshift(defaultNotSelectListData);
+					deviceFormatter();
+				},
+				error: function (err) {
+					alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+				}
+			});
+	
+			$("#form-addLocationlist").validate({
+				rules: {
+					name: { required: true, minlength: 2 },
+					phone: { required: true},
+					address: { required: true},
+				},
+				messages: {
+					name: { required: "<%= __('name.require') %>", minlength: "<%= __('name.minlength') %>" },
+					phone: { required: "<%= __('phone.require') %>"},
+					address: { required: "<%= __('address.require') %>"},
+				},
+				submitHandler: function (form) {
+					$.formSubmit(form, "../location");
+				}
+			});
+	
+			
+		})
+	
+		deviceFormatter = function () {
+			var baseString;
+			var adlistIDValue;
+			for (x in adlistData) {
+				adlistIDValue = adlistData[x].id == "ad_notSelectedDefined" ? "" : adlistData[x].id;
+				baseString = "<option value =" + adlistIDValue + ">" + adlistData[x].name + "</option>\n";
+				$('#active_adlist_id').append(baseString);
+			}
+		};
+	</script>

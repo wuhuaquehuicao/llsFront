@@ -1,0 +1,51 @@
+<a href="../admin"">
+	<i class="fa fa-arrow-left" aria-hidden="true"></i>
+	<%= __('User list') %>
+</a>
+
+<form id="form-editUser" method="get" action="../api/admin/resetPassword">
+    <div class="form-row">
+        <div class="form-group col-md-4" style="display:none;">
+            <label for="id">
+                <%= __('id') %>
+            </label>
+            <input type="text" class="form-control" id="id" placeholder="<%= __('id') %>" name="id" value="<%= data.id %>">
+        </div>	
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-4" style="margin-top:10px;">
+            <label for="name">
+                <%= __('Reset the following email password:') %>
+            </label>
+            <input type="text" class="form-control" id="name"  name="name" value="<%= data.name %>" disabled>
+        </div>
+    </div>
+
+    <div class="form-row" style="margin-top:20px">
+        <a href="../admin" class="btn btn-secondary">
+            <%= __('cancel') %>
+        </a>
+        <button type="submit" class="btn btn-primary" id="reset-password-btn" style="margin-left:10px">
+            <%= __('Reset password') %>
+        </button>   
+    </div>
+</form>
+
+<script>
+     $("#reset-password-btn").click(function(event){
+        var email = $("#name").val();
+        var msg = "Are you sure to send one temporary password to " + email + "?";
+        if (!confirm(msg)) {
+            event.preventDefault();
+			return;
+        }   
+    });
+
+    $(function () {
+		$("#form-editUser").validate({
+			submitHandler: function (form) {
+				$.formSubmit(form, "../admin");
+			}
+		});
+	})
+</script>

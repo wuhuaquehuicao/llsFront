@@ -1,0 +1,314 @@
+<a href="location/add" class="btn btn-light">
+	<i class="fa fa-plus" aria-hidden="true"></i>
+	<%= __('add') %>
+</a>
+
+<div id="toolbar" class="form-row align-items-center">
+	<div class="col-auto my-1">
+		<input type="text" class="form-control" id="key" placeholder="Search name">
+	</div>
+	
+</div>
+
+<table id="locationlist-table"></table>
+
+<div class="modal fade" id="myPWDModal">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<%= __('changePassword') %>
+				</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+			</div>
+
+				<div class="modal-body">
+				<form id="myformpwd" class="pwdEditForm">
+					<input id="pwdEditFormLocationId" type="text" name="location_id" value="" style="display:none;">
+					<input id="pwdEditFormId" type="text" name="id" value="" style="display:none;">
+					<input id="pwdEditFormPWD" type="text" name="password" autofocus>
+					<button id="save-pwd-btn" class="btn btn-secondary"><%= __('save') %></button>
+				</form>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<!--update password and prevent fresh entire page-->
+<script>
+ $("#save-pwd-btn").click(function(event) {
+   event.preventDefault();
+
+   var form = $('#myformpwd');
+   console.log($(form).serialize());
+   $.ajax( {
+      data: $(form).serialize(),
+      type: 'put',
+      url: '../api/location/changeLocationPassword',
+      success: function( feedback ){
+         console.log( "the feedback from your API: " + feedback );
+         $("#locationlist-table").bootstrapTable('refresh');
+         $("#myPWDModal").modal("hide");
+        // $("#myPWDModal").modal("show");
+      },
+      error: function(feedback) {
+      	console.log( "error feedback from your API: ");
+      }
+    });
+
+ });
+</script>
+
+
+<script>
+	var adlistData;
+	var defaultNotSelectListData= {
+		"id": "ad_notSelectedDefined",
+		"name": "<%= __('Please Select') %>"
+	};
+	var objectArraySort = function (keyName) {
+		return function (objectN, objectM) {
+			var valueN = objectN[keyName]
+			var valueM = objectM[keyName]
+			if (valueN < valueM) return -1
+			else if (valueN > valueM) return 1
+			else return 0
+		}
+	}
+
+	$(function () {
+		var url = "./api/adlist";
+		var uniqueId = 'id'
+		var $form = $(this)
+		$.ajax({
+			type: "Get",
+			url: url,
+			data: $form.serialize(),
+			timeout: 30000,
+			success: function (data) {
+				adlistData = data.concat();
+				adlistData.sort(objectArraySort('name'))
+				adlistData.unshift(defaultNotSelectListData);
+				initLocatoinList();
+			},
+			error: function (err) {
+				alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+			}
+		})
+	});
+
+	initLocatoinList = function () {
+		var $table = $("#locationlist-table");
+		var url = "./api/location/page";
+		var uniqueId = 'id'
+		var columns = [
+			{
+				field: "Options",
+				title: '<%= __('operations') %>',
+				align: 'center',
+				formatter: function (value, row, index) {
+					return `
+						<a class="text-secondary" href="location/toedit?id=${row.id}" title="<%= __('operations') %>">
+							<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+						</a>
+						`;
+				},
+			},
+			{ 
+				field: "name", 
+				title: '<%= __('location.name') %>', 
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return value;
+					}
+					return ""
+				}
+			},
+			{ 
+				field: "adlistsummary", 
+				title: '<%= __('adlistsummary') %>', 
+				align: 'center',
+				formatter: deviceFormatter
+			},
+			{
+				field: "created_at",
+				title: '<%= __('created_at') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return new Date(value).toLocaleString();
+					}
+					return ""
+				}
+			},
+			{ 
+				field: "password", 
+				title: '<%= __('password') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function operateFormatter(value, row, index) {
+			        return '<a class="edit-pwd" href="javascript:void(0)" style="text-decoration:underline" title="Edit  '+value+'">'+value+'</a>';
+			      },
+				  events: {	
+					'click .edit-pwd': function (e, value, row, index) {
+						$("#pwdEditFormLocationId").val(row.location_id);
+						$("#pwdEditFormId").val(row.id);
+						$("#pwdEditFormPWD").val(value);
+						$("#myPWDModal").modal("show");
+					}
+				  }   
+			},
+			{ 
+				field: "devices", 
+				title: '<%= __('totaldevice') %>',
+				align: 'center',
+				formatter: function (value, row, index) {
+					if (value) {
+						return value;
+					}
+					return "0"
+				}
+			},
+			{ 
+				field: "contact", 
+				title: '<%= __('contact') %>', 
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return value;
+					}
+					return ""
+				}
+			},
+			{ 
+				field: "phone", 
+				title: '<%= __('phone') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return value;
+					}
+					return ""
+				}
+			},
+			{ 
+				field: "email", 
+				title: '<%= __('email') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return value;
+					}
+					return ""
+				}
+			},
+			{ 
+				field: "address",
+				title: '<%= __('location.address') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return value;
+					}
+					return ""
+				}
+			}
+			
+		];
+
+		$table.initBsTable({
+			url: url,
+			columns: columns,
+			uniqueId: uniqueId,
+			queryParams: function(params){
+				return {
+					offset: params.offset,
+					limit: params.limit,
+					order: params.order,
+					sort: params.sort || "created_at",
+					key: $('#key').val()
+				}
+			},
+			sidePagination: "server"
+		});
+
+		$('#key').keyup(function () {
+			$.throttle(doSearch);
+		})
+
+		function doSearch() {
+			if($('#key').val() == ""){
+				$table.bootstrapTable('refresh', { silent: true, url: './api/location/page', });
+			}
+			else{
+				$table.bootstrapTable('refresh', { silent: true, url: './api/location/key', });
+			}
+		}	
+	}
+
+	deviceFormatter = function (value, row, index) {
+		var baseString = "<select onchange=selectOnChange(this,\"" + row.id + "\",\"" + row.active_adlist_id + "\")>\n";
+		for (x in adlistData) {
+			if(adlistData[x].id == row.active_adlist_id){
+				baseString = baseString + "<option value =" + x + " selected='selected'>" + adlistData[x].name + "</option>\n";
+			}
+			else{
+				baseString = baseString + "<option value =" + x + ">" + adlistData[x].name + "</option>\n";
+			}
+		}
+
+		baseString += "</select>";
+
+		return baseString;
+	};
+
+	function selectOnChange(obj, location_id, default_active_id) {
+		var selectTD = $(obj).parent().parent().find("td");  
+
+		var location_name = selectTD.eq(1).text();
+		var location_contact = selectTD.eq(4).text();
+		var location_phone = selectTD.eq(5).text();
+		var location_email = selectTD.eq(6).text();
+		var location_address = selectTD.eq(7).text();
+
+		var defaut_active_index = 0;
+		for(index in adlistData){
+			if(adlistData[index].id == default_active_id){
+				defaut_active_index = index;
+			}
+		}
+		var adlist_change_value = obj.selectedIndex;
+		var adlist_change_id = adlistData[adlist_change_value].id
+		console.log("selected :" + adlistData[adlist_change_value].name + ", adlist id=" + adlistData[adlist_change_value].id + ", location Id=" + location_id);
+		
+		var activeAdlist;
+		if(adlistData[adlist_change_value].id == "ad_notSelectedDefined"){
+			activeAdlist = {id: location_id, active_adlist_id: "", name: location_name, contact:location_contact, phone: location_phone, email:location_email, address: location_address};
+		}else{
+			activeAdlist = {id: location_id, active_adlist_id: adlist_change_id , name: location_name, contact:location_contact, phone: location_phone, email:location_email, address: location_address};
+		}
+		console.log(activeAdlist);
+		$.ajax({
+                type: "PUT",
+                url: "./api/location/edit",
+                data: activeAdlist,
+                timeout: 30000,
+                success: function (data) {
+                    alert("Updated success");
+                },
+                error: function (err) {
+					obj.selectedIndex = defaut_active_index;
+                    alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+                }
+            })
+	}
+</script>

@@ -1,0 +1,546 @@
+<div id="toolbar" class="form-row align-items-center">
+	<div class="col-auto my-1">
+		<input type="text" class="form-control" style="width:330px;" id="key" placeholder="Search MAC Address, Location or Label ">
+	</div>
+	<div style="margin-left:30px" id="globalLocationDIV">
+	</div>
+	<div style="margin-left:5px" id="applyGlobalLocationButtonDIV">
+	</div>
+</div>
+
+<table id="devices-table">
+</table>
+
+<div class="modal fade" id="myModal">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<%= __('inputMemo') %>
+				</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+			</div>
+
+				<div class="modal-body">
+				<form id="myform" class="memoEditForm">
+					<input id="memoEditFormLocationIdx" type="text" name="idx" style="display:none;">
+					<input id="memoEditFormLocationId" type="text" name="location_id" value="" style="display:none;">
+					<input id="memoEditFormId" type="text" name="id" value="" style="display:none;">
+					<input id="memoEditFormMemo" type="text" name="name" autofocus>
+					<button id="save-btn" class="btn btn-secondary"><%= __('save') %></button>
+					<!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button> -->
+				</form>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="myPWDModal">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<h4 class="modal-title">
+					<%= __('changePassword') %>
+				</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+			</div>
+
+				<div class="modal-body">
+				<form id="myformpwd" class="pwdEditForm">
+					<input id="pwdEditFormPWDIdx" type="text" name="idx" style="display:none;">
+					<input id="pwdEditFormLocationId" type="text" name="location_id" value="" style="display:none;">
+					<input id="pwdEditFormId" type="text" name="id" value="" style="display:none;">
+					<input id="pwdEditFormPWD" type="text" name="password" autofocus>
+					<button id="save-pwd-btn" class="btn btn-secondary"><%= __('save') %></button>
+				</form>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+</div>
+
+<!--update labe name and prevent fresh entire page-->
+<script>
+ $("#save-btn").click(function(event) {
+   event.preventDefault();
+
+   var form = $('#myform');
+   $.ajax( {
+      data: $(form).serialize(),
+      type: 'put',
+      url: '../api/devices/update',
+      success: function( feedback ){
+         console.log( "the feedback from your API: " + feedback );
+         //$("#devices-table").bootstrapTable('refresh');
+          var idx = $("#memoEditFormLocationIdx").val();
+          var name = $("#memoEditFormMemo").val();
+          $("#devices-table").bootstrapTable('updateRow', {
+                index: idx,
+                row: {
+                    name: name
+                }
+           });
+
+         $("#myModal").modal("hide");
+         $("#myModal").modal("show");
+      },
+      error: function(feedback) {
+      	console.log( "error feedback from your API: ");
+      }
+    });
+
+ });
+</script>
+
+<!--update password and prevent fresh entire page-->
+<script>
+ $("#save-pwd-btn").click(function(event) {
+   event.preventDefault();
+
+   var form = $('#myformpwd');
+   $.ajax( {
+      data: $(form).serialize(),
+      type: 'put',
+      url: '../api/devices/update',
+      success: function( feedback ){
+         console.log( "the feedback from your API: " + feedback );
+        // $("#devices-table").bootstrapTable('refresh');
+         var idx = $("#pwdEditFormPWDIdx").val();
+          var password = $("#pwdEditFormPWD").val();
+          $("#devices-table").bootstrapTable('updateRow', {
+                index: idx,
+                row: {
+                    password: password
+                }
+           });
+         $("#myPWDModal").modal("hide");
+        // $("#myPWDModal").modal("show");
+      },
+      error: function(feedback) {
+      	console.log( "error feedback from your API: ");
+      }
+    });
+
+ });
+</script>
+
+
+<script>
+	var locationData;
+	var showSelectAll = false;
+	var unSelectedDevicesID = new Array();
+	var batchLocationID = "";
+	var pageOffset = 0;
+	var defaultLocation = {
+		"id": "loc_NotAllocated",
+		"name": "Please Select"
+	};
+
+	var formatMacAdd = function (add) {
+		var str = add, result = "";
+		for (var i = 0, len = str.length; i < len; i++) {
+			result += str[i];
+			if ((i % 2 == 1) && (i != len - 1)) result += ':';
+		}
+
+		return result;
+	}
+
+	var objectArraySort = function (keyName) {
+		return function (objectN, objectM) {
+			var valueN = objectN[keyName]
+			var valueM = objectM[keyName]
+			if (valueN < valueM) return 1
+			else if (valueN > valueM) return -1
+			else return 0
+		}
+	}
+
+	$(function () {
+		var url = "./api/location";
+		var uniqueId = 'id'
+		var $form = $(this)
+		$.ajax({
+			type: "Get",
+			url: url,
+			data: $form.serialize(),
+			timeout: 30000,
+			success: function (data) {
+				locationData = data.concat();
+				locationData.sort(objectArraySort('name'))
+				locationData.unshift(defaultLocation);
+				globalLocationFormatter();
+				initDevicesTable();
+			},
+			error: function (err) {
+				alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+			}
+		})
+	});
+
+	initDevicesTable = function () {
+		var $table = $("#devices-table");
+		var url = "./api/devices/searchByPage";
+		var uniqueId = 'id'
+		var columns = [
+			{
+				field: "Options",
+				title: '<%= __('index') %>',
+				width: 80,
+				align: 'center',
+				formatter: function (value, row, index) {
+					var isDisplayCheckButton = showSelectAll? "visibled" : "none";
+					var currentIndex = pageOffset + index + 1;
+					return `
+						<label class="index">
+							${currentIndex}
+						</label>
+						<a class="text-secondary" style="margin-left:10px">
+							<input type="checkbox" checked ='checked' value='${row.id}' onclick="updateCheckstate(this)" style="display:${isDisplayCheckButton}">
+						</a>
+						`;
+				},
+			},
+			{
+				field: "id",
+				title: '<%= __('mac') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						var mac_string = value;
+						mac_string = mac_string.toUpperCase();
+						return formatMacAdd(mac_string);
+					}
+					return value
+				}
+			},
+			{
+				field: "location_id",
+				title: '<%= __('location') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: stageFormatter
+			},
+			//{ field: "battery_health", title: '<%= __('battery_health') %>', align: 'center' },
+			{ 
+				field: "password", 
+				title: '<%= __('password') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function operateFormatter(value, row, index) {	     
+			        return '<a class="edit-pwd" href="javascript:void(0)" style="text-decoration:underline" title="Edit  '+value+'">'+value+'</a>';
+			      },
+				  events: {	
+					'click .edit-pwd': function (e, value, row, index) {
+						$("#pwdEditFormPWDIdx").val(index);
+						$("#pwdEditFormLocationId").val(row.location_id);
+						$("#pwdEditFormId").val(row.id);
+						$("#pwdEditFormPWD").val(value);
+						$("#myPWDModal").modal("show");
+					}
+				  }   
+			},
+			// {
+			// 	field: "battery_level",
+			// 	title: '<%= __('battery_level') %>',
+			// 	formatter: function (value, row, index) {
+			// 		var a = value + '%';
+			// 		if (value < 20) {
+			// 			a = '<span style="color:#FF0000">' + value + '%</span>';
+			// 		}
+			// 		return a;
+			// 	}
+			// },
+			{
+				field: "active",
+				title: '<%= __('active') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					var a = '<span style="color:#00ff00">Active</span>';
+					if (value == 0) {
+						a = '<span style="color:#FF0000">Inactive</span>';
+					}
+					return a;
+				}
+			},
+			{
+				field: "created_at",
+				title: '<%= __('created_at') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return new Date(value).toLocaleString();
+					}
+					return ""
+				}
+			},
+			{
+				field: "updated_at",
+				title: '<%= __('updated_at') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return new Date(value).toLocaleString();
+					}
+					return ""
+				}
+			},
+			{ 
+				field: "version", 
+				title: '<%= __('App Version') %>', 
+				align: 'center',
+				sortable: 'true' 
+			},
+			{
+				field: "name",
+				title: '<%= __('Label') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					// var result = '<a class="memoCell" onclick="popoverInitialization();" href="#" data-toggle="popover" data-placement="top" title="" data-content=\'<form class="memoEditForm" method="put" action="../api/devices/update"><input type="text" name="id" value="' + row.id + '" style="display:none;"><input type="text" name="name" autofocus><br><input type="submit" value="Save" onclick="popoverInitialization();"><input type="button" value="Cancel"></form>\'>' + value + '</a>';
+					var memoName=value;
+					if(value.length <= 0){
+						memoName='-';
+					}
+					var result = "<a class=\"memoCell\" href=\"#\" style='text-decoration:underline' onclick=\"setDeviceID(this,\'"+row.location_id+"\' , \'"+index+"\')\" id=\"" + row.id + "\" class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#myModal\" title=\""+ memoName +"\">" + memoName + "</a>";
+					return result;
+				}
+			},
+			{ 
+				field: "model", 
+				title: '<%= __('Model') %>', 
+				align: 'center',
+				sortable: 'true'
+			}
+		];
+		
+		$table.initBsTable({
+			url: url,
+			columns: columns,
+			uniqueId: uniqueId,
+			pageNumber: 1,
+        	pageSize: 100,
+       		pageList: [10, 20, 50, 100, 200],
+			queryParams: function(params){
+				var tmp = {
+					offset: params.offset,
+					limit: params.limit,
+					order: params.order,
+					sort: params.sort || "id",
+					key: $('#key').val(),
+					locationKeys: findLocationId($('#key').val())
+				};
+				pageOffset = params.offset;
+				unSelectedDevicesID = new Array();
+
+				return tmp;
+			},
+			sidePagination: "server"
+		});
+
+		$('#key').keyup(function () {
+			$.throttle(doSearch);
+		})
+
+		function doSearch() {
+			if($('#key').val() == ""){
+				$table.bootstrapTable('refresh', { silent: true, url: './api/devices/searchByPage', });
+			}
+			else{
+				$table.bootstrapTable('refresh', { silent: true, url: './api/devices/searchByKey', });
+			}
+		}	
+	}
+
+	function contains(array, value){
+		if (array.indexOf(value) != -1) {
+   			return true;
+  		} else {
+   		 	return false;
+  		}
+	}
+
+	function findLocationId(lName){
+		var locationArray = new Array();
+		for (x in locationData) {
+			var reg = new RegExp(lName, "i");
+			if (locationData[x].name.search(reg) != -1) {
+				locationArray.push(locationData[x].id);
+			} 
+		}
+		return locationArray.toString();
+	}
+
+	function popoverInitialization() {
+
+		$('[data-toggle="popover"]').popover({ html: true });
+
+		$(".memoEditForm").validate({
+			rules: {
+				// name: { required: true, minlength: 2 },
+			},
+			messages: {
+				// name: { required: "<%= __('name.require') %>", minlength: "<%= __('name.minlength') %>" },
+			},
+			submitHandler: function (form) {
+				$.formSubmit(form, "/devices");
+			}
+		});
+	}
+
+	$("#devices-table").mouseenter(function () {
+		// console.log("mouseenter");
+		popoverInitialization();
+	});
+
+	function setDeviceID(obj, locationId, index) {
+		$("#memoEditFormLocationIdx").attr("value", index);
+		$("#memoEditFormLocationId").attr("value", locationId);
+		$("#memoEditFormId").attr("value", obj.id);
+		$("#memoEditFormMemo").attr("value", obj.title);
+	}
+
+	stageFormatter = function (value, row, index) {
+		var baseString = "<select onchange=selectOnChang(this,\"" + row.id + "\",\"" + row.location_id + "\")>\n";
+		for (x in locationData) {
+			if (locationData[x].id == row.location_id) {
+				baseString = baseString + "<option value =" + x + " selected='selected'>" + locationData[x].name + "</option>\n";
+			} else {
+				baseString = baseString + "<option value =" + x + ">" + locationData[x].name + "</option>\n";
+			}
+		}
+
+		baseString += "</select>";
+
+		return baseString;
+	};
+
+	function globalLocationFormatter(){
+		var baseString = "<select onchange=selectGlobalLocation(this) class='custom-select form-control' id='globalLocation'>";
+		for (x in locationData) {
+			baseString = baseString + "<option value =" + x + ">" + locationData[x].name + "</option>\n";
+		}
+		baseString += "</select>";
+		$("#globalLocationDIV").html(baseString);
+
+		var baseButtonString = "<button class='btn btn-primary' onclick='applyLocation()' id='globalApply'>Apply location to devices on the page</button>"
+		$("#applyGlobalLocationButtonDIV").html(baseButtonString);
+	} 
+
+	function updateCheckstate(obj){
+		if(!obj.checked){
+			unSelectedDevicesID.push(obj.value);
+		}
+		else{
+			unSelectedDevicesID.pop(obj.value);
+		}
+		console.log(unSelectedDevicesID);
+	}
+
+	function applyLocation(){
+		if(batchLocationID != ""){
+
+			var $table = $("#devices-table");
+			var pageData = $table.bootstrapTable("getData");
+			var applyDevices = new Array();
+		
+			for(index in pageData){
+				if(!contains(unSelectedDevicesID, pageData[index].id)){
+					applyDevices.push(pageData[index].id);
+				}
+			}
+			console.log(applyDevices);
+
+			var url = `../api/devices/batchdevices/${batchLocationID}`;
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: {"device_ids": applyDevices},
+				timeout: 30000,
+				success: function (data) {
+					var globalLocationObj = $("#globalLocation")[0];
+					globalLocationObj.selectedIndex = 0;
+					showSelectAll = false;
+					selectGlobalLocation(globalLocationObj);
+					
+					alert("Updated success");
+				},
+				error: function (err) {
+					alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+				}
+			})
+		}{
+			console.log("batchLocationID null");
+		}
+	};
+
+	function selectGlobalLocation(obj){
+		var change_value = obj.selectedIndex;
+		if (locationData[change_value].id == "loc_NotAllocated"){
+			showSelectAll = false;
+			batchLocationID = "";
+		}else{
+			showSelectAll = true;
+			batchLocationID = locationData[change_value].id;
+		}
+		
+		var $table = $("#devices-table");
+		$table.bootstrapTable('refresh', { silent: true});
+	}
+
+	function selectOnChang(obj, deviceId, default_location_id) {
+		var selectTD = $(obj).parent().parent().find("td");  
+
+		var memo_name = selectTD.eq(9).text();
+		var change_value = obj.selectedIndex; 
+		var devices_value = deviceId;
+		console.log("selected :" + locationData[change_value].name + ", location id=" + locationData[change_value].id + ", device Id=" + devices_value);
+		
+		var device;
+		var defaut_location_index = 0;
+		for(index in locationData){
+			if(locationData[index].id == default_location_id){
+				defaut_location_index = index;
+			}
+		}
+
+		// if (locationData[change_value].id == "loc_NotAllocated"){
+		// 	obj.selectedIndex = defaut_location_index;
+		// 	alert("Please select a location for the device.");
+		// 	return;
+		// }
+		
+		if (locationData[change_value].id == "loc_NotAllocated") {
+			device = { id: deviceId, location_id: "", name: memo_name};
+		} else {
+			device = { id: deviceId, location_id: locationData[change_value].id, name: memo_name};
+		}
+
+		$.ajax({
+			type: "PUT",
+			url: "./api/devices/update",
+			data: device,
+			timeout: 30000,
+			success: function (data) {
+				var $table = $("#devices-table");
+				$table.bootstrapTable('refresh', {silent: true});
+				alert("Updated success");
+			},
+			error: function (err) {
+				obj.selectedIndex = defaut_location_index;
+				alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+			}
+		})
+	}
+
+</script>

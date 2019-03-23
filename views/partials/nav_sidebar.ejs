@@ -1,0 +1,35 @@
+<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+    <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/adlist">
+                    <i class="fa fa-television" aria-hidden="true"></i>&nbsp
+                    <%= __('adlist') %>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/location">
+                    <i class="fa fa-television" aria-hidden="true"></i>&nbsp
+                    <%= __('locations') %>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/devices">
+                    <i class="fa fa-television" aria-hidden="true"></i>&nbsp
+                    <%= __('devices') %>
+                </a>
+            </li>
+            <li class="nav-item">
+                    <a class="nav-link" href="/adstatistics">
+                        <i class="fa fa-television" aria-hidden="true"></i>&nbsp
+                        <%= __('adstatistics') %>
+                    </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<script>
+    var path = window.location.pathname.split('/')[1];
+    $('.nav > li > a[href="/' + path + '"]').addClass('active');
+</script>

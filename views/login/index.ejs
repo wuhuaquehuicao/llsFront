@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>
+        <%= __('login') %>
+    </title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheet/login.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+    <div class="btn-group select-lan">
+        <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <%= __('language') %>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <button class="dropdown-item setlang" value="en">English</button>
+            <!-- <button class="dropdown-item setlang" value="zh">中文</button> -->
+        </div>
+    </div>
+
+    <form class="form-signin" id="loginForm" action="./api/login" method="post">
+        <div class="form-label-group">
+            <input type="text" id="name" name="name" class="form-control" placeholder="Name" value="admin@cmn.com" required autofocus>
+            <label for="name">
+                <%= __('name') %>
+            </label>
+        </div>
+
+        <div class="form-label-group">
+            <input type="password" name="password" id="password" class="form-control" placeholder="Password" value="123456" required>
+            <label for="password">
+                <%= __('password') %>
+            </label>
+        </div>
+
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" value="remember-me">
+                <%= __('rememberMe') %>
+            </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">
+            <%= __('signIn') %>
+        </button>
+        <p class="mt-5 mb-3 text-muted text-center">
+            Copyright © 2018 TOMA Media. Version
+            <%= version %>.
+        </p>
+    </form>
+
+    <script>
+        $('#loginForm').submit(function (e) {
+            e.preventDefault()
+            var $form = $(this)
+            $.ajax({
+                type: $form.attr('method'),
+                url: $form.attr('action'),
+                data: $form.serialize(),
+                timeout: 30000,
+                success: function (data) {
+                    window.location = "../";
+                },
+                error: function (err) {
+					alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+				}
+            })
+        })
+
+        $('.setlang').click(function (e) {
+            e.preventDefault();
+            let $this = $(this);
+            let lang = $this.val();
+            $.ajax({
+                url: `./api/setlang?lan=${lang}`,
+                timeout: 30000,
+                success: function (data) {
+                    location.reload()
+                },
+                error: function (err) {
+					alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+				}
+            })
+        })
+    </script>
+</body>
+
+</html>

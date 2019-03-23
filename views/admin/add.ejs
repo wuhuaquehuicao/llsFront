@@ -1,0 +1,42 @@
+<a href="../admin"">
+	<i class="fa fa-arrow-left" aria-hidden="true"></i>
+	<%= __('User list') %>
+</a>
+
+<form id="form-createUser" method="post" action="../api/admin/create">
+	<div class="form-row">
+		<div class="form-group col-md-6" style="margin-top:10px;>
+			<label for="name">
+				<%= __('Add new user:') %>
+			</label>
+			<input type="text" class="form-control" id="name" placeholder="<%= __('Enter Email') %>" name="name">
+		</div>
+	</div>
+
+	<div class="form-row" style="margin-top:20px">
+		<a href="../admin" class="btn btn-secondary">
+			<%= __('cancel') %>
+		</a>
+		<button type="submit" class="btn btn-primary" style="margin-left:10px">
+			<%= __('Create') %>
+		</button>
+	</div>
+</form>
+
+<script>
+	$(function () {
+		$("#form-createUser").validate({
+			rules: {
+				name: { required: true, minlength: 2 },
+				description: { rangelength: [0, 200] },
+			},
+			messages: {
+				name: { required: "<%= __('name.require') %>", minlength: "<%= __('name.minlength') %>" },
+				description: { rangelength: "<%= __('description.rangelength') %>" },
+			},
+			submitHandler: function (form) {
+				$.formSubmit(form, "../admin");
+			}
+		});
+	})
+</script>

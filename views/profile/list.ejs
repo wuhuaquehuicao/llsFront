@@ -1,0 +1,79 @@
+<form id="form-changepassword" method="put" action="../api/admin/changepassword">
+<div class="form-row">
+    <div class="form-group col-md-4" style="display:none;">
+        <label for="id">
+            <%= __('id') %>
+        </label>
+        <input type="text" class="form-control" id="id" placeholder="<%= __('id') %>" name="id">
+    </div>	
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label for="name">
+            <%= __('Change your password:') %>
+        </label>
+        <div style="margin-left:20px">
+            <div>
+                <label for="oldpassword">
+                    <%= __('Old password:') %>
+                </label>
+                <input type="password" class="form-control" id="oldpassword" name="oldpassword">
+            </div>
+            <div style="margin-top:20px">
+                <div>
+                    <label for="newpassword">
+                        <%= __('New password:') %>
+                    </label>
+                    
+                    <input type="password" class="form-control" id="newpassword" name="newpassword">
+                    </div>
+                <div style="margin-top:5px">
+                    <label for="confirmpassword">
+                            <%= __('Confirm password:') %>
+                    </label>
+                    <input type="password" class="form-control" id="confirmpassword" name="confirmpassword">
+                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-row" style="margin-top:20px">
+    <button class="btn btn-secondary" id="cancel-button" value= "<%= data.original_pwd %>" onclick="cancel(this)">
+        <%= __('cancel') %>
+    </button>
+    <button class="btn btn-primary" id="update-password-btn" style="margin-left:10px">
+        <%= __('Confirm') %>
+    </button>   
+</div>
+</form>
+
+<script>
+    function cancel(obj){
+        if(obj.value == 1){
+            var href="/adlist";
+            window.location.href = href;
+        }else{
+            history.back(-1);
+        }
+    }
+
+    $(function () {
+        $("#form-changepassword").validate({
+                rules:{
+					oldpassword: { required: true, minlength: 8},
+					newpassword: { required: true, minlength: 8},
+					confirmpassword: {required: true, minlength: 8, equalTo: "#newpassword"},
+				},
+				messages: {
+					oldpassword: { required: "<%= __('Please input old password') %>" },
+					newpassword: { required: "<%= __('Please input new password') %>"},
+					confirmpassword: { required: "<%= __('Please input new password again') %>", equalTo:"<%= __('Please input the same password.') %>"},
+				},
+				submitHandler: function (form) {
+					$.formSubmit(form, "../adlist");
+				}
+			});
+    })
+    
+</script>

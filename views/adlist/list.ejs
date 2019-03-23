@@ -1,0 +1,179 @@
+<a href="adlist/add" class="btn btn-light">
+	<i class="fa fa-plus" aria-hidden="true"></i>
+	<%= __('add') %>
+</a>
+
+<div id="toolbar" class="form-row align-items-center">
+	<div class="col-auto my-1">
+		<input type="text" class="form-control" id="key" placeholder="Search ad list name">
+	</div>
+</div>
+
+<!-- <div id="toolbar">
+	<a href="adlist/add" class="btn btn-light">
+		<i class="fa fa-plus" aria-hidden="true"></i>
+		<%= __('add') %>
+	</a>
+</div> -->
+
+
+
+<table id="adlist-table"></table>
+
+<script>
+	$(function () {
+		var $table = $("#adlist-table");
+		var url = "./api/adlist/page";
+		var uniqueId = 'id'
+		var columns = [
+			{
+				field: "Options",
+				title: '<%= __('operations') %>',
+				align: 'center',
+				formatter: function (value, row, index) {
+					return `
+						<a class="text-secondary" href="adlist/toedit?id=${row.id}" title="<%= __('operations') %>">
+							<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+						</a>
+						<a class="text-danger remove-option" style="margin-left:10px" href="#">
+							<i class="fa fa-trash" aria-hidden="true"></i>
+						</a>
+						`;
+				},
+				events: {
+					"click .remove-option": function (e, value, row, index) {
+						if (confirm("Sure to remove?")) {
+							$.ajax({
+								url: "./api/adlist/remove",
+								type: "POST",
+								data: { id: row.id },
+								timeout: 5000,
+								dataType: "json",
+								success: function (data) {
+									alert("success");
+									$table.bootstrapTable("refresh");
+								},
+								error: function (err) {
+									console.log(err)
+									alert("failure");
+								},
+							});
+						}
+						return;
+					}
+				}
+			},
+			{ field: "name", title: '<%= __('adlist.name') %>', align: 'center' /*, filterControl: "input" */ },
+			{ field: "description", title: '<%= __('description') %>', align: 'center' },
+			{
+				field: "layout",
+				title: '<%= __('layout') %>',
+				align: 'center',
+				//filterControl: "select",
+				formatter: function (value, row, index) {
+					if (value == 0) {
+						return 'Full screen images'
+					}
+					if (value == 1) {
+						return 'Split screen images and video'
+					}
+					if (value == 2) {
+						return 'Full screen images and video'
+					}
+					return '';
+				}
+			},
+			{
+				field: "ads",
+				title: '<%= __('ads') %>',
+				align: 'center',
+				formatter: function (value, row, index) {
+					if (value) {
+						return value.length;
+
+					}
+					return "";
+				}
+			},
+			{ field: "slide_interval", title: '<%= __('slideInterval') %>', align: 'center' },
+			{
+				field: "created_at",
+				title: '<%= __('created_at') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return new Date(value).toLocaleString();
+					}
+					return ""
+				}
+			},
+			{
+				field: "updated_at",
+				title: '<%= __('updated_at') %>',
+				align: 'center',
+				sortable: 'true',
+				formatter: function (value, row, index) {
+					if (value) {
+						return new Date(value).toLocaleString();
+					}
+					return ""
+				}
+			},
+		];
+		$table.initBsTable({
+			url: url,
+			columns: columns,
+			uniqueId: uniqueId,
+			sortOrder: "desc",
+			queryParams: function (params) {
+				var tmp = {
+					limit: params.limit,
+					offset: params.offset,
+					// filter: params.filter || '',
+					sort: params.sort || "created_at",
+					order: params.order,
+					key: $('#key').val()
+				};
+				return tmp;
+			},
+			sidePagination: "server",
+			// filterControl: "true"
+			// showExport: "true"
+		});
+
+		/*
+				$table.initBsTable({
+					url: url,
+					columns: columns,
+					uniqueId: uniqueId,
+					queryParams: function(params){
+						return {
+							offset: params.offset,
+							limit: params.limit,
+							order: params.order,
+							sort: params.sort || "id",
+						}
+					},
+					sidePagination: "server"
+				}); 
+		*/
+
+		$('#key').keyup(function () {
+			$.throttle(doSearch);
+		})
+
+		function doSearch() {
+			if ($('#key').val() == "") {
+				$table.bootstrapTable('refresh', { silent: true, url: './api/adlist/filter', });
+
+			}
+			else {
+				$table.bootstrapTable('refresh', { silent: true, url: './api/adlist/filter', });
+			}
+		}
+
+	});
+
+
+</script>

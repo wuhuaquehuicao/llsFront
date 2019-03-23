@@ -1,0 +1,111 @@
+<a href="../devices"">
+	<i class="fa fa-arrow-left" aria-hidden="true"></i>
+	<%= __('devices') %>
+</a>
+
+<form id="form-updatedevices" method="put" action="../api/devices/update">
+	<div class="form-row">
+		<div class="form-group col-md-6" style="display:none;">
+			<label for="id">
+				<%= __('id') %>
+			</label>
+			<input type="text" class="form-control" id="id" placeholder="<%= __('id') %>" name="id" value="<%= data.id %>">
+		</div>	
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label for="name">
+				label
+			</label>
+			<input type="text" class="form-control" id="name" placeholder="<%= __('devices.name') %>" name="name" value="<%= data.name %>">
+		</div>
+	</div>
+	
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label for="location_id">
+				<%= __('location') %> :
+			</label>
+			<select id="location_id" onchange=selectOnChange(this) placeholder="<%= __('devices.location') %>" name="location_id"></select>
+		</div>
+	</div>
+
+	<a href="../devices" class="btn btn-secondary">
+		<%= __('cancel') %>
+	</a>
+	<button type="submit" class="btn btn-primary">
+		<%= __('submit') %>
+	</button>
+</form>
+
+<script>
+		var locationData;
+		var defaultLocation = {
+			"id": "loc_NotAllocated",
+			"name": "Please Select"
+		};
+
+		var objectArraySort = function (keyName) {
+				return function (objectN, objectM) {
+					var valueN = objectN[keyName]
+					var valueM = objectM[keyName]
+					if (valueN < valueM) return 1
+					else if (valueN > valueM) return -1
+					else return 0
+				}
+			}
+
+		$(function () {
+			var url = "./../api/location";
+			var uniqueId = 'id'
+			var $form = $(this)
+			$.ajax({
+				type: "Get",
+				url: url,
+				data: $form.serialize(),
+				timeout: 30000,
+				success: function (data) {
+					locationData = data.concat();
+					locationData.sort(objectArraySort('name'))
+					locationData.unshift(defaultLocation);
+					deviceFormatter("<%= data.location_id %>");
+				},
+				error: function (err) {
+					alert(err.responseJSON ? err.responseJSON.msg : err.statusText);
+				}
+			})
+		});
+
+		deviceFormatter = function (activeID) {
+			var baseString;
+			var locationIDValue;
+			for (x in locationData) {
+				locationIDValue = locationData[x].id == "loc_NotAllocated" ? "" : locationData[x].id;
+				if (locationData[x].id == activeID) {
+					baseString = "<option value =" + locationIDValue + " selected='selected'>" + locationData[x].name + "</option>\n";
+				}
+				else {
+					baseString = "<option value =" + locationIDValue + ">" + locationData[x].name + "</option>\n";
+				}
+				$('#location_id').append(baseString);
+			}
+		};
+
+		function selectOnChange(obj, deviceId) {
+
+		};
+
+		$(function () {
+			$("#form-updatedevices").validate({
+				rules: {
+					name: { required: true, minlength: 2 },
+				},
+				messages: {
+					name: { required: "<%= __('name.require') %>", minlength: "<%= __('name.minlength') %>" },
+				},
+				submitHandler: function (form) {
+					$.formSubmit(form, "../devices");
+				}
+			});
+		});
+	</script>
